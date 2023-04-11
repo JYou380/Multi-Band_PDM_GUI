@@ -101,7 +101,7 @@ class Application(tk.Frame):
         axs[1].set_ylabel("Theta",fontsize=sizef)
         axs[2].set_xlabel("Phase",fontsize=sizef)
         axs[2].set_ylabel("Mag",fontsize=sizef)
-        axs[2].yaxis_inverted()
+        axs[2].invert_yaxis()
         axs[0].set_title(self.outputfigname[:-4],fontsize=sizef)
         plt.savefig(self.outputfigname)
 

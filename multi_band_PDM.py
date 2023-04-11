@@ -12,7 +12,7 @@ df = pd.read_csv(filepath_or_buffer='01344188+3053275.csv')
 S= pyPDM.Scanner(minVal=100,maxVal=1200,dVal=1,mode="period")
 
 col_list = list(set(df['filter'].tolist()))
-col_list.remove['filter']
+
 #print(col_list)
 
 fig,axs=plt.subplots(3,1,figsize=(8,10))
@@ -44,11 +44,11 @@ for data_filter in col_list:
     error=np.array( df['error'][df['filter']==data_filter].tolist())
     phase=np.array( df['MJD'][df['filter']==data_filter].tolist())/best_period - np.array( df['MJD'][df['filter']==data_filter].tolist())//best_period
     axs[2].errorbar(phase,mag,error,fmt='.')
-
+sizef=17
 axs[1].set_xlabel("period",fontsize=sizef)
 axs[0].set_ylabel("Theta",fontsize=sizef)
 axs[1].set_ylabel("Theta",fontsize=sizef)
 axs[2].set_xlabel("Phase",fontsize=sizef)
 axs[2].set_ylabel("Mag",fontsize=sizef)
-axs[2].yaxis_inverted()
+axs[2].invert_yaxis()
 plt.show()
