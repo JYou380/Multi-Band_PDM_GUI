@@ -12,6 +12,7 @@ df = pd.read_csv(filepath_or_buffer='01344188+3053275.csv')
 S= pyPDM.Scanner(minVal=100,maxVal=1200,dVal=1,mode="period")
 
 col_list = list(set(df['filter'].tolist()))
+col_list.remove['filter']
 #print(col_list)
 
 fig,axs=plt.subplots(3,1,figsize=(8,10))

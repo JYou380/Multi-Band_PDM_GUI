@@ -71,6 +71,7 @@ class Application(tk.Frame):
         self.outputfigname=filename_split_path[-1][:-4]+".png"
         S= pyPDM.Scanner(minVal=float(self.var_min.get()),maxVal=float(self.var_max.get()),dVal=0.1,mode="period")
         col_list = list(set(df['filter'].tolist()))
+        col_list.remove['filter']
         sizef=17
         fig,axs=plt.subplots(3,1,figsize=(8,10))
         fig.subplots_adjust(hspace=0.4)
