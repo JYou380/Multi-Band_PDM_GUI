@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import filedialog
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+from PyAstronomy.pyTiming import pyPDM
+
 
 
 class Application(tk.Frame):
@@ -43,11 +46,11 @@ class Application(tk.Frame):
         self.calculate_button.pack()
 
 
-        self.scatter_button = tk.Button(self)  #輸出圖形顯示按鈕
-        self.scatter_button["text"] = "scatter"
-        self.scatter_button["state"] = "disabled"
-        self.scatter_button["command"] = self.show_scatter
-        self.scatter_button.pack(side="bottom")
+        self.result_button = tk.Button(self)  #輸出圖形顯示按鈕
+        self.result_button["text"] = "result"
+        self.result_button["state"] = "disabled"
+        self.result_button["command"] = self.show_result
+        self.result_button.pack(side="bottom")
 
 
 
@@ -59,35 +62,55 @@ class Application(tk.Frame):
         
     def calculate_start(self): #計算按鈕函式
         self.calculate_statistics(self.flname)
-        self.scatter_button["state"] = "normal"
-        self.show_scatter(self.filename)
-
-    # def calculate_statistics(self,filename):
-    #     data = pd.read_csv(filename)
-    #     mean = data.mean()
-    #     std = data.std()
-    #     filename_split_path = filename.split("/")
-    #     self.result_label["text"] = filename_split_path[-1][:-4]+'\n'+f"平均值：{mean}\n標準差：{std}"+"\n"+str(self.var_max.get())+"\n"+str(self.var_min.get())
-
-    #     outputfigname=filename_split_path[-1][:-4]+".png"
-    #     plt.scatter(data["x"], data["y"])
-    #     plt.xlabel("x")
-    #     plt.ylabel("y")
-    #     plt.title("scatter")
-    #     plt.savefig(outputfigname)
-    #     self.outputfigname = outputfigname
+        self.result_button["state"] = "normal"
+        #self.show_scatter(self.flname)
 
     def calculate_statistics(self,filename):  #運算函式
-        data = pd.read_csv(filename)
+        df = pd.read_csv(filename)
+        filename_split_path = filename.split("/")
+        self.outputfigname=filename_split_path[-1][:-4]+".png"
+        S= pyPDM.Scanner(minVal=float(self.var_min.get()),maxVal=float(self.var_max.get()),dVal=0.1,mode="period")
+        col_list = list(set(df['filter'].tolist()))
+        sizef=17
+        fig,axs=plt.subplots(3,1,figsize=(8,10))
+        fig.subplots_adjust(hspace=0.4)
+        f_total=1
+        t_total=1
+        for data_filter in col_list:
+            MJD=np.array( df['MJD'][df['filter']==data_filter].tolist())
+            mag=np.array( df['mag'][df['filter']==data_filter].tolist())
+            P_filter=pyPDM.PyPDM(MJD,mag)
+            f,t =  P_filter.pdmEquiBinCover(10,4,S)
+            axs[0].plot(f, t)
+            f_total=f
+            t_total=t_total*t
 
-    def show_scatter(self):  # 結果圖展示功能函式
-        scatter_window = tk.Toplevel(self.master)
-        scatter_window.title("scatter")
+        axs[1].plot(f_total,t_total)
+        best_period=f_total[t_total== np.max(t_total)]
+        self.result_label["text"] = "best period ="+str(best_period)
+        for data_filter in col_list:
+            MJD=np.array( df['MJD'][df['filter']==data_filter].tolist())
+            mag=np.array( df['mag'][df['filter']==data_filter].tolist())
+            error=np.array( df['error'][df['filter']==data_filter].tolist())
+            phase=np.array( df['MJD'][df['filter']==data_filter].tolist())/best_period - np.array( df['MJD'][df['filter']==data_filter].tolist())//best_period
+            axs[2].errorbar(phase,mag,error,fmt='.')
+        axs[1].set_xlabel("period",fontsize=sizef)
+        axs[0].set_ylabel("Theta",fontsize=sizef)
+        axs[1].set_ylabel("Theta",fontsize=sizef)
+        axs[2].set_xlabel("Phase",fontsize=sizef)
+        axs[2].set_ylabel("Mag",fontsize=sizef)
+        axs[0].set_title(self.outputfigname[:-4],fontsize=sizef)
+        plt.savefig(self.outputfigname)
+
+
+    def show_result(self):  # 結果圖展示功能函式
+        result_window = tk.Toplevel(self.master)
+        result_window.title("result")
         #scatter_window.geometry("1024x1024")
-        scatter_image = tk.PhotoImage(file=self.outputfigname)
-        scatter_label = tk.Label(scatter_window, image=scatter_image)
-        scatter_label.image = scatter_image
-        scatter_label.pack()
+        result_image = tk.PhotoImage(file=self.outputfigname)
+        result_label = tk.Label(result_window, image=result_image)
+        result_label.image = result_image
+        result_label.pack()
 
 
 root = tk.Tk()
