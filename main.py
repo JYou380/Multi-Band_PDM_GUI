@@ -11,6 +11,7 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
+        self.master.title("Multi-band PDM GUI")
         self.master.geometry("1024x1024") # 設定UI介面大小為512x512像素
         self.pack()
         self.create_widgets()
@@ -100,6 +101,7 @@ class Application(tk.Frame):
         axs[1].set_ylabel("Theta",fontsize=sizef)
         axs[2].set_xlabel("Phase",fontsize=sizef)
         axs[2].set_ylabel("Mag",fontsize=sizef)
+        axs[2].yaxis_inverted()
         axs[0].set_title(self.outputfigname[:-4],fontsize=sizef)
         plt.savefig(self.outputfigname)
 
