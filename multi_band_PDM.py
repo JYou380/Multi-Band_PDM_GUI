@@ -35,7 +35,7 @@ for data_filter in col_list:
 
 axs[1].plot(f_total,t_total)
 
-best_period=f_total[t_total== np.max(t_total)]
+best_period=f_total[t_total== np.min(t_total)]
 
 for data_filter in col_list:
     #print (data_filter)
