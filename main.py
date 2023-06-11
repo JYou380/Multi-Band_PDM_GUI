@@ -88,7 +88,7 @@ class Application(tk.Frame):
             t_total=t_total*t
 
         axs[1].plot(f_total,t_total)
-        best_period=f_total[t_total== np.max(t_total)]
+        best_period=f_total[t_total== np.min(t_total)]
         self.result_label["text"] = "best period ="+str(best_period)
         for data_filter in col_list:
             MJD=np.array( df['MJD'][df['filter']==data_filter].tolist())
